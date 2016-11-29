@@ -101,17 +101,19 @@ public class Distribuidor {
                 socketConexion = socketServidor.accept();
                 is = new ObjectInputStream(socketConexion.getInputStream()); // Abro el flujo de datos de ENTRADA (Cliente -> Servidor)
                 System.out.println("Se conectó:\t" + (String) is.readObject() + "\n");  // Leo qué farmacia se conectó (identificación del cliente)
+                
+                
                 // Comienzo a funcionar
-                Medicamento n  = (Medicamento) is.readObject(); // Leo el pedido
-                System.out.println("He recibido un pedido: " + n.getNombre());
+                Pedido p = (Pedido)is.readObject(); // Recibo el pedido de dicho cliente
+                System.out.println("He recibido un pedido: " + p.getMiMedicamento().getNombre() + "\t" + p.getNumero() + " unidades" + "\n");
                 os = new ObjectOutputStream(socketConexion.getOutputStream()); // Abro el flujo de datos de SALIDA (Servidor -> Cliente)
                 
                 // Mando lo que me piden
-                Medicamento m = new Medicamento(1,"Androcur");
-                os.writeObject(m);
+                Pedido nuevo = new Pedido(p.getMiMedicamento(), p.getNumero());
+                os.writeObject(nuevo); // Le envío el pedido
                 socketConexion.close();
 
-                // Aquí gestiono mi estructra de datos
+               
             } while (true);
 
         } catch (IOException e) {

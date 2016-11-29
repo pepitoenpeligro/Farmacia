@@ -71,12 +71,16 @@ public class SenioresFarmaceuticos {
     private static ArrayList<Medicamento> almacenDisponible = new ArrayList<>(); // los medicamentos en el almacen
     
 
-   public static void recibeMedicamentos(ObjectInputStream is, ArrayList<Medicamento> a) throws IOException, ClassNotFoundException{
-       Medicamento nuevo = (Medicamento) is.readObject();
-       almacenDisponible.add(nuevo);
-       System.out.println("Se ha recibido el siguiente medicamento: \n"
-                            + "Identificador:\t" +  nuevo.getIdentificador() + "\n"
-                            + "Nombre:\t" + nuevo.getNombre() + "\n"
+   public static void recibeMedicamentos(ObjectInputStream is, ArrayList<Medicamento> a, Pedido p) throws IOException, ClassNotFoundException{
+       Pedido nuevo = (Pedido) is.readObject();
+       for(int i = 0; i < p.getNumero(); i++){
+           almacenDisponible.add(p.getMiMedicamento());
+       }
+       
+       //almacenDisponible.add(nuevo);
+       System.out.println("Se ha recibido el siguiente pedido completado: \n"
+                            + "Cantidad:\t" +  nuevo.getNumero() + "\n"
+                            + "Nombre:\t" + nuevo.getMiMedicamento().getNombre() + "\n"
                             + "\n");
    }
 
@@ -98,23 +102,20 @@ public class SenioresFarmaceuticos {
        try{
            System.out.println("Bienvenido cliente");
            socketServicio = new Socket(host,port);
-           //System.out.println("Conexión desde:\t" + id + "\n");
+
+           os = new ObjectOutputStream(socketServicio.getOutputStream()); // Abro el flujo de datos (Cliente -> Servidor)
+           os.writeObject(id);  // Le mando al servidor mi identificación
+           Pedido p = new Pedido(new Medicamento(1,"Androcurs"),3);
+           os.writeObject(p); // Le envio el pedido
+           //os.writeObject(new Medicamento(1,"Androcurs"));// Le mando el pedido
            
-           //outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
-           //inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
-           
-           //OutputStream ss = socketServicio.getOutputStream();
-           os = new ObjectOutputStream(socketServicio.getOutputStream()); // Envio el medicamento que quiero recibir
-           os.writeObject(id);
-           os.writeObject(new Medicamento(1,"Androcurs"));// Le mando el pedido
-           
-           is = new ObjectInputStream(socketServicio.getInputStream()); // Para recibir medicamentos
+           is = new ObjectInputStream(socketServicio.getInputStream()); // Abro el flujo de datos (Servidor -> Cliente)
            //os = new ObjectOutputStream(socketServicio.getOutputStream()); // Para enviar medicamentos
 //           Medicamento nuevo = (Medicamento) is.readObject();
 //           System.out.println("Se ha recibido un medicamento");
 //           System.out.println("El medicamento recibido es: " + nuevo.getNombre() + nuevo.getIdentificador()+ "\n");
            
-            recibeMedicamentos(is, almacenDisponible);
+           recibeMedicamentos(is, almacenDisponible, p);
             //recibeMedicamentos(is, almacenDisponible);
            
 
