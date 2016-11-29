@@ -13,7 +13,7 @@ import java.util.Date;
  * @author pepito
  */
 public class Medicamento implements Serializable{
-    private int identificador;
+    private long identificador;
     private String nombre;
     
 
@@ -32,11 +32,11 @@ public class Medicamento implements Serializable{
         this.nombre = nombre;
     }
 
-    public int getIdentificador() {
+    public long getIdentificador() {
         return identificador;
     }
 
-    public void setIdentificador(int identificador) {
+    public void setIdentificador(long identificador) {
         this.identificador = identificador;
     }
 
