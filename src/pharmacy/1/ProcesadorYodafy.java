@@ -70,7 +70,7 @@ public class ProcesadorYodafy {
 			
 			
 		} catch (IOException e) {
-			System.err.println("Error al obtener los flujso de entrada/salida.");
+			System.err.println("Error al obtener los flujos de entrada/salida.");
 		}
 
 	}
