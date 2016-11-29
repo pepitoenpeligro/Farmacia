@@ -16,6 +16,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Random;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,18 +33,17 @@ import org.xml.sax.SAXException;
 public class Distribuidor {
     // Datos a manejar
     static private ArrayList<Medicamento> miAlmacen = new ArrayList();
-    static int bytesLeidos = 0;
-    static byte []buffer = new byte[256];
-    
+
     // Conexión
     static ServerSocket socketServidor = null;
     static Socket socketConexion = null;
-    static int port = 8989;
-    private static BufferedReader inReader;
-    private static String miCadenitaQueherecibio;
+    static final int port = 8989;
+    
     
     private static ObjectInputStream is = null;
     private static ObjectOutputStream os = null;
+    
+    
     
     public static void LeerXML(String path) throws ParserConfigurationException, SAXException, IOException{
         
@@ -53,23 +53,17 @@ public class Distribuidor {
         Document doc = dBuilder.parse(fXmlFile);
             
         doc.getDocumentElement().normalize();
-        System.out.println("Elemento raíz " + doc.getDocumentElement().getNodeName());
             
         NodeList nList = doc.getElementsByTagName("dcpf"); // Leo los elementos dcpf
-        System.out.println("#######################");
         
         // Leo cada una de las entradas en la base de datos xml
         for(int i = 0; i < nList.getLength(); i++){
             Node nNode = nList.item(i);
                 
-            System.out.println("Elemento actual: " + nNode.getNodeName());
+            
             if(nNode.getNodeType() == Node.ELEMENT_NODE){
                 Element eElement = (Element) nNode;
-                System.out.println("Producto número [" + i + "]");
-                System.out.println("Código:\t" + eElement.getElementsByTagName("codigodcpf").item(0).getTextContent());
-                System.out.println("Nombre:\t" + eElement.getElementsByTagName("nombredcpf").item(0).getTextContent());
-                System.out.println("______________________________________");
-                System.out.println();
+
                 // Meto el medicamento en el almacén
                 miAlmacen.add(new Medicamento(
                                         (int)Long.parseUnsignedLong(eElement.getElementsByTagName("codigodcpf").item(0).getTextContent()),
@@ -84,34 +78,39 @@ public class Distribuidor {
     
     
     
-    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException{
-        
+    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException, ClassNotFoundException{
+        System.out.println("##########################################################################");
+        System.out.println("Bienvenido al sistema de gestión de Farmacias LaVeneno®\n");
+        System.out.println("José Antonio Córdoba Gómez");
+        System.out.println("Marta Arenas Martínez");
+        System.out.println("Motivación: (ninguna) Práctica 2 de Fundamentos de Redes\n");
         // Antes de realizar la conexión del servidor, vamos a cargar los medicamentos disponibles
         LeerXML("resources/DICCIONARIO_DCPF.xml");
-        miAlmacen.toString();
+        //miAlmacen.toString();
+        System.out.println("##########################################################################");
+        
         
         
         
         try {
             socketServidor = new ServerSocket(port);
-            System.out.println("Estoy esperando maricón");
+            System.out.println("Estoy esperando a que los señores farmacéuticos se conecten.\nEspero que no tarden mucho porque tengo la práctica 3 de ISE sin acabar\n");
 
             do {
+                
                 socketConexion = socketServidor.accept();
-                System.out.println("Hay al menos un cliente que se ha conectado a mi");
-                //inReader = new BufferedReader(new InputStreamReader(socketConexion.getInputStream()));
+                is = new ObjectInputStream(socketConexion.getInputStream()); // Abro el flujo de datos de ENTRADA (Cliente -> Servidor)
+                System.out.println("Se conectó:\t" + (String) is.readObject() + "\n");  // Leo qué farmacia se conectó (identificación del cliente)
+                // Comienzo a funcionar
+                Medicamento n  = (Medicamento) is.readObject(); // Leo el pedido
+                System.out.println("He recibido un pedido: " + n.getNombre());
+                os = new ObjectOutputStream(socketConexion.getOutputStream()); // Abro el flujo de datos de SALIDA (Servidor -> Cliente)
                 
-            //is = new ObjectInputStream(socketConexion.getInputStream()); // Para recibir medicamentos
-            os = new ObjectOutputStream(socketConexion.getOutputStream()); // Para enviar medicamentos
-            
-            Medicamento m = new Medicamento(1,"Androcur");
-            os.writeObject(m);
-            socketConexion.close();
-//                miCadenitaQueherecibio = inReader.readLine();
-//                System.out.println(miCadenitaQueherecibio.toString());
-//                miCadenitaQueherecibio = inReader.readLine();
-//                System.out.println(miCadenitaQueherecibio.toString());
-                
+                // Mando lo que me piden
+                Medicamento m = new Medicamento(1,"Androcur");
+                os.writeObject(m);
+                socketConexion.close();
+
                 // Aquí gestiono mi estructra de datos
             } while (true);
 
@@ -119,13 +118,6 @@ public class Distribuidor {
             System.err.println("Error al escuchar en el puerto " + port);
         }
         
-        
-        
-        
     }
-    
-    
-    
-    
-    
+
 }

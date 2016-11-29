@@ -1,6 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <aemps_prescripcion_dcpf xmlns="http://schemas.aemps.es/prescripcion/aemps_prescripcion_dcpf" xsi:schemaLocation="http://schemas.aemps.es/prescripcion/aemps_prescripcion_dcpf http://schemas.aemps.es/prescripcion/aemps_prescripcion_dcpf.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <dcpf>
+    <codigodcpf>0</codigodcpf>
+    <nombredcpf>Androcurs 1gr</nombredcpf>
+    <nombrecortodcpf>Androcurs 1gr</nombrecortodcpf>
+    <codigodcp>0</codigodcp>
+  </dcpf>
+    <dcpf>
     <codigodcpf>21000140102</codigodcpf>
     <nombredcpf>Abacavir 300 mg 60 comprimidos</nombredcpf>
     <nombrecortodcpf>Abacavir 300 mg 60 comprimidos</nombrecortodcpf>

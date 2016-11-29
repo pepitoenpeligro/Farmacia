@@ -34,8 +34,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 public class SenioresFarmaceuticos {
+    private static ArrayList<String> identificadores = new ArrayList<>();
+    
+    
     // Buffers de envio y recepción
     private static byte[] buferEnvio;
     private static byte[] buferRecepcion = new byte[256];
@@ -53,12 +57,16 @@ public class SenioresFarmaceuticos {
     
     // Elemento de conexión
     private static Socket socketServicio = null;
-    private static PrintWriter outPrinter;
-    private static BufferedReader inReader;
+
     private static Medicamento m;
     
     private static ObjectInputStream is = null;
     private static ObjectOutputStream os = null;
+    
+    static Random r = new Random();
+    static String id = null;
+    
+    String identificadorFarmacia = "Farmacia Berenjeno";
     
     private static ArrayList<Medicamento> almacenDisponible = new ArrayList<>(); // los medicamentos en el almacen
     
@@ -74,15 +82,32 @@ public class SenioresFarmaceuticos {
 
    
    public static void main(String[] args) throws ParseException, ClassNotFoundException{
+       identificadores.add("Farmacias Berenjeno");
+       identificadores.add("Farmacias Marisol");
+       identificadores.add("Farmacias La Armillense");
+       identificadores.add("Farmacias el linense junkillero");
+       identificadores.add("Farmacias desconocida");
+       identificadores.add("Farmacias con el Sevilla no apruebas ni a la tercera");
+       identificadores.add("Farmacias aún no tengo la práctica 3 de ISE terminada ni esperanzas de tenerla");
+       identificadores.add("A comprar profilacticos a otro sitio");
+       identificadores.add("Aquí no se vende lubricante");
+       
+       id = identificadores.get(r.nextInt(9-0) + 0);
+       
+       
        try{
            System.out.println("Bienvenido cliente");
            socketServicio = new Socket(host,port);
-           System.out.println("Farmacia conectada\n");
+           //System.out.println("Conexión desde:\t" + id + "\n");
            
            //outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
            //inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
            
-           OutputStream ss = socketServicio.getOutputStream();
+           //OutputStream ss = socketServicio.getOutputStream();
+           os = new ObjectOutputStream(socketServicio.getOutputStream()); // Envio el medicamento que quiero recibir
+           os.writeObject(id);
+           os.writeObject(new Medicamento(1,"Androcurs"));// Le mando el pedido
+           
            is = new ObjectInputStream(socketServicio.getInputStream()); // Para recibir medicamentos
            //os = new ObjectOutputStream(socketServicio.getOutputStream()); // Para enviar medicamentos
 //           Medicamento nuevo = (Medicamento) is.readObject();
