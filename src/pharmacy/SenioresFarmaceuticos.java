@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -31,6 +32,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class SenioresFarmaceuticos {
@@ -54,24 +56,39 @@ public class SenioresFarmaceuticos {
     private static PrintWriter outPrinter;
     private static BufferedReader inReader;
     private static Medicamento m;
-
+    
+    private static ObjectInputStream is = null;
+    private static ObjectOutputStream os = null;
+    
+    private static ArrayList<Medicamento> almacenDisponible = new ArrayList<>(); // los medicamentos en el almacen
     
 
+   
 
-   public static void main(String[] args) throws ParseException{
+
+   public static void main(String[] args) throws ParseException, ClassNotFoundException{
        try{
+           System.out.println("Bienvenido cliente");
            socketServicio = new Socket(host,port);
-           outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
-           inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
+           System.out.println("Farmacia conectada\n");
+           
+           //outPrinter = new PrintWriter(socketServicio.getOutputStream(),true);
+           //inReader = new BufferedReader(new InputStreamReader(socketServicio.getInputStream()));
            
            OutputStream ss = socketServicio.getOutputStream();
-     
+           is = new ObjectInputStream(socketServicio.getInputStream()); // Para recibir medicamentos
+           //os = new ObjectOutputStream(socketServicio.getOutputStream()); // Para enviar medicamentos
+           Medicamento nuevo = (Medicamento) is.readObject();
+           System.out.println("Se ha recibido un medicamento");
+           System.out.println("El medicamento recibido es: " + nuevo.getNombre() + nuevo.getIdentificador()+ "\n");
            
-           m = new Medicamento("Androcur");
+           
 
-           outPrinter.println(m.getNombre());
-           outPrinter.println(m.getNombre()+"2");
-           outPrinter.flush();
+//           outPrinter.println(m.getNombre());
+//           outPrinter.println(m.getNombre()+"2");
+//           outPrinter.flush();
+
+            //os.writeObject(m);
            
            //miCadenitaQueherecibio= inReader.readLine();
            //outPrinter.println(miCadenitaQueherecibio);

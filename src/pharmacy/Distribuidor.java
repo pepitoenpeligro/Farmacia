@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,9 +33,15 @@ public class Distribuidor {
     private static BufferedReader inReader;
     private static String miCadenitaQueherecibio;
     
+    private static ObjectInputStream is = null;
+    private static ObjectOutputStream os = null;
+    
     
     
     public static void main(String[] args){
+        
+        // Antes de realizar la conexión del servidor, vamos a cargar los medicamentos disponibles
+        
         
         try {
             socketServidor = new ServerSocket(port);
@@ -42,11 +50,18 @@ public class Distribuidor {
             do {
                 socketConexion = socketServidor.accept();
                 System.out.println("Hay al menos un cliente que se ha conectado a mi");
-                inReader = new BufferedReader(new InputStreamReader(socketConexion.getInputStream()));
-                miCadenitaQueherecibio = inReader.readLine();
-                System.out.println(miCadenitaQueherecibio.toString());
-                miCadenitaQueherecibio = inReader.readLine();
-                System.out.println(miCadenitaQueherecibio.toString());
+                //inReader = new BufferedReader(new InputStreamReader(socketConexion.getInputStream()));
+                
+            //is = new ObjectInputStream(socketConexion.getInputStream()); // Para recibir medicamentos
+            os = new ObjectOutputStream(socketConexion.getOutputStream()); // Para enviar medicamentos
+            
+            Medicamento m = new Medicamento(1,"Androcur");
+            os.writeObject(m);
+            socketConexion.close();
+//                miCadenitaQueherecibio = inReader.readLine();
+//                System.out.println(miCadenitaQueherecibio.toString());
+//                miCadenitaQueherecibio = inReader.readLine();
+//                System.out.println(miCadenitaQueherecibio.toString());
                 
                 // Aquí gestiono mi estructra de datos
             } while (true);

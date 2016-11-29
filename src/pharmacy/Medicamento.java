@@ -5,17 +5,21 @@
  */
 package pharmacy;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *
  * @author pepito
  */
-public class Medicamento {
+public class Medicamento implements Serializable{
+    private int identificador;
     private String nombre;
+    
 
 
-    public Medicamento(String nombre) {
+    public Medicamento(int identificador, String nombre) {
+        this.identificador = identificador;
         this.nombre = nombre;
     }
 
@@ -24,9 +28,16 @@ public class Medicamento {
     }
 
 
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public int getIdentificador() {
+        return identificador;
+    }
+
+    public void setIdentificador(int identificador) {
+        this.identificador = identificador;
     }
 
 
