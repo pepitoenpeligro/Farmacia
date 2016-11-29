@@ -63,9 +63,16 @@ public class SenioresFarmaceuticos {
     private static ArrayList<Medicamento> almacenDisponible = new ArrayList<>(); // los medicamentos en el almacen
     
 
+   public static void recibeMedicamentos(ObjectInputStream is, ArrayList<Medicamento> a) throws IOException, ClassNotFoundException{
+       Medicamento nuevo = (Medicamento) is.readObject();
+       almacenDisponible.add(nuevo);
+       System.out.println("Se ha recibido el siguiente medicamento: \n"
+                            + "Identificador:\t" +  nuevo.getIdentificador() + "\n"
+                            + "Nombre:\t" + nuevo.getNombre() + "\n"
+                            + "\n");
+   }
+
    
-
-
    public static void main(String[] args) throws ParseException, ClassNotFoundException{
        try{
            System.out.println("Bienvenido cliente");
@@ -78,10 +85,12 @@ public class SenioresFarmaceuticos {
            OutputStream ss = socketServicio.getOutputStream();
            is = new ObjectInputStream(socketServicio.getInputStream()); // Para recibir medicamentos
            //os = new ObjectOutputStream(socketServicio.getOutputStream()); // Para enviar medicamentos
-           Medicamento nuevo = (Medicamento) is.readObject();
-           System.out.println("Se ha recibido un medicamento");
-           System.out.println("El medicamento recibido es: " + nuevo.getNombre() + nuevo.getIdentificador()+ "\n");
+//           Medicamento nuevo = (Medicamento) is.readObject();
+//           System.out.println("Se ha recibido un medicamento");
+//           System.out.println("El medicamento recibido es: " + nuevo.getNombre() + nuevo.getIdentificador()+ "\n");
            
+            recibeMedicamentos(is, almacenDisponible);
+            //recibeMedicamentos(is, almacenDisponible);
            
 
 //           outPrinter.println(m.getNombre());
