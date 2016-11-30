@@ -70,7 +70,7 @@ public class SenioresFarmaceuticos {
     private static ObjectInputStream is = null;
     private static ObjectOutputStream os = null;
     
-    static int r = 0;
+    static Random r = new Random();
     static String id = null;
     
     String identificadorFarmacia = "Farmacia Berenjeno";
@@ -103,11 +103,9 @@ public class SenioresFarmaceuticos {
         NodeList nList = doc.getElementsByTagName("dcpf"); // Leo los elementos dcpf
         
         // Leo cada una de las entradas en la base de datos xml
+       
         
-        int inicio = (int) Math.random()*nList.getLength() + 0;
-        int fin = (int) Math.random()+nList.getLength() + inicio;
-        
-        for(int i= inicio; i < fin; i++){
+        for (int i=0; i<nList.getLength(); i++){ 
             Node nNode = nList.item(i);
                 
             
@@ -138,12 +136,9 @@ public class SenioresFarmaceuticos {
        identificadores.add("Farmacias Popular");
        int contador = 0;
         do {
-            r = (int) Math.random()*(identificadores.size()-1) + 0;
-            System.out.println("Identificador " + identificadores.size());
-            System.out.println("Random 1 " + r);
-            id = identificadores.get(r);
-            System.out.println("Farmacias " + identificadores.get(r));
-
+            
+            id = identificadores.get(0+r.nextInt(identificadores.size()-1));
+            contador++;
 
             
             try{
@@ -157,13 +152,10 @@ public class SenioresFarmaceuticos {
 
                 rellenarAlmacen("resources/DICCIONARIO_DCPF.xml");
 
-                r = (int) Math.random()*(almacenDisponible.size()) + 0;
-
-                System.out.println(" RANDOM 2" + r);
-                System.out.println("Medicamento " + almacenDisponible.get(r).getNombre());
+                
 
 
-                Pedido p = new Pedido(almacenDisponible.get(r),(int)Math.random()*20 + 1);
+                Pedido p = new Pedido(almacenDisponible.get(0+r.nextInt(almacenDisponible.size()-11)), 1+r.nextInt(20));
 
                 os.writeObject(p); // Le envio el pedido
                 //os.writeObject(new Medicamento(1,"Androcurs"));// Le mando el pedido
@@ -175,7 +167,7 @@ public class SenioresFarmaceuticos {
 
 
                 socketServicio.close();
-                contador++;
+                
 
             } catch (IOException ex) {
                  Logger.getLogger(SenioresFarmaceuticos.class.getName()).log(Level.SEVERE, null, ex);
