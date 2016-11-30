@@ -31,10 +31,10 @@ import org.xml.sax.SAXException;
  * @author pepito
  */
 public class Distribuidor {
-    // Datos a manejar
+    // Almacén de medicamentos.
     static private ArrayList<Medicamento> miAlmacen = new ArrayList();
 
-    // Conexión
+    // Servers y puerto para la conexión
     static ServerSocket socketServidor = null;
     static Socket socketConexion = null;
     static final int port = 8989;
@@ -44,7 +44,7 @@ public class Distribuidor {
     private static ObjectOutputStream os = null;
     
     
-    
+    // Lee los elementos de la base de datos.
     public static void LeerXML(String path) throws ParserConfigurationException, SAXException, IOException{
         
         File fXmlFile = new File(path);
@@ -83,7 +83,7 @@ public class Distribuidor {
         System.out.println("Bienvenido al sistema de gestión de Farmacias LaVeneno®\n");
         System.out.println("José Antonio Córdoba Gómez");
         System.out.println("Marta Arenas Martínez");
-        System.out.println("Motivación: (ninguna) Práctica 2 de Fundamentos de Redes\n");
+        System.out.println("Práctica 2 de Fundamentos de Redes\n");
         // Antes de realizar la conexión del servidor, vamos a cargar los medicamentos disponibles
         LeerXML("resources/DICCIONARIO_DCPF.xml");
         //miAlmacen.toString();
@@ -94,7 +94,7 @@ public class Distribuidor {
         
         try {
             socketServidor = new ServerSocket(port);
-            System.out.println("Estoy esperando a que los señores farmacéuticos se conecten.\nEspero que no tarden mucho porque tengo la práctica 3 de ISE sin acabar\n");
+            System.out.println("Estoy esperando a que las farmacias se conecten.\n");
 
             do {
                 
@@ -115,7 +115,6 @@ public class Distribuidor {
 
                
             } while (true);
-
         } catch (IOException e) {
             System.err.println("Error al escuchar en el puerto " + port);
         }

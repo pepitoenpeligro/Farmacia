@@ -21,6 +21,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,6 +36,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class SenioresFarmaceuticos {
     private static ArrayList<String> identificadores = new ArrayList<>();
@@ -46,8 +55,6 @@ public class SenioresFarmaceuticos {
     
     // resultado de la conexión auxiliares.
     private static int bytesLeidos = 0;
-    private static String recibido;
-    private static String miCadenitaQueherecibio;
     
     // Conexión
     // Nombre del host donde se ejecuta el servidor:
@@ -63,7 +70,7 @@ public class SenioresFarmaceuticos {
     private static ObjectInputStream is = null;
     private static ObjectOutputStream os = null;
     
-    static Random r = new Random();
+    static int r = 0;
     static String id = null;
     
     String identificadorFarmacia = "Farmacia Berenjeno";
@@ -84,56 +91,97 @@ public class SenioresFarmaceuticos {
                             + "\n");
    }
 
-   
-   public static void main(String[] args) throws ParseException, ClassNotFoundException{
-       identificadores.add("Farmacias Berenjeno");
-       identificadores.add("Farmacias Marisol");
-       identificadores.add("Farmacias La Armillense");
-       identificadores.add("Farmacias el linense junkillero");
-       identificadores.add("Farmacias desconocida");
-       identificadores.add("Farmacias con el Sevilla no apruebas ni a la tercera");
-       identificadores.add("Farmacias aún no tengo la práctica 3 de ISE terminada ni esperanzas de tenerla");
-       identificadores.add("A comprar profilacticos a otro sitio");
-       identificadores.add("Aquí no se vende lubricante");
-       
-       id = identificadores.get(r.nextInt(9-0) + 0);
-       
-       
-       try{
-           System.out.println("Bienvenido cliente");
-           socketServicio = new Socket(host,port);
+   public static void rellenarAlmacen (String path) throws ParserConfigurationException, SAXException, IOException{
+        
+        File fXmlFile = new File(path);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(fXmlFile);
+            
+        doc.getDocumentElement().normalize();
+            
+        NodeList nList = doc.getElementsByTagName("dcpf"); // Leo los elementos dcpf
+        
+        // Leo cada una de las entradas en la base de datos xml
+        
+        int inicio = (int) Math.random()*nList.getLength() + 0;
+        int fin = (int) Math.random()+nList.getLength() + inicio;
+        
+        for(int i= inicio; i < fin; i++){
+            Node nNode = nList.item(i);
+                
+            
+            if(nNode.getNodeType() == Node.ELEMENT_NODE){
+                Element eElement = (Element) nNode;
 
-           os = new ObjectOutputStream(socketServicio.getOutputStream()); // Abro el flujo de datos (Cliente -> Servidor)
-           os.writeObject(id);  // Le mando al servidor mi identificación
-           Pedido p = new Pedido(new Medicamento(1,"Androcurs"),3);
-           os.writeObject(p); // Le envio el pedido
-           //os.writeObject(new Medicamento(1,"Androcurs"));// Le mando el pedido
-           
-           is = new ObjectInputStream(socketServicio.getInputStream()); // Abro el flujo de datos (Servidor -> Cliente)
-           //os = new ObjectOutputStream(socketServicio.getOutputStream()); // Para enviar medicamentos
-//           Medicamento nuevo = (Medicamento) is.readObject();
-//           System.out.println("Se ha recibido un medicamento");
-//           System.out.println("El medicamento recibido es: " + nuevo.getNombre() + nuevo.getIdentificador()+ "\n");
-           
-           recibeMedicamentos(is, almacenDisponible, p);
-            //recibeMedicamentos(is, almacenDisponible);
-           
+                // Meto el medicamento en el almacén
+                almacenDisponible.add(new Medicamento(
+                                        (int)Long.parseUnsignedLong(eElement.getElementsByTagName("codigodcpf").item(0).getTextContent()),
+                                        eElement.getElementsByTagName("nombredcpf").item(0).getTextContent()
+                                        ));
+            }
+            
+        }
+        
+        
+    }
+    
+   public static void main(String[] args) throws ParseException, ClassNotFoundException, ParserConfigurationException, SAXException{
+       identificadores.add("Farmacias Farmatodo");
+       identificadores.add("Farmacias Poniente");
+       identificadores.add("Farmacias La Armillera");
+       identificadores.add("Farmacias SanaSana");
+       identificadores.add("Farmacias Granada");
+       identificadores.add("Farmacias Sevilla");
+       identificadores.add("Farmacias CruzVerde");
+       identificadores.add("Farmacias OptimaFar");
+       identificadores.add("Farmacias Popular");
+       int contador = 0;
+        do {
+            r = (int) Math.random()*(identificadores.size()-1) + 0;
+            System.out.println("Identificador " + identificadores.size());
+            System.out.println("Random 1 " + r);
+            id = identificadores.get(r);
+            System.out.println("Farmacias " + identificadores.get(r));
 
-//           outPrinter.println(m.getNombre());
-//           outPrinter.println(m.getNombre()+"2");
-//           outPrinter.flush();
 
-            //os.writeObject(m);
-           
-           //miCadenitaQueherecibio= inReader.readLine();
-           //outPrinter.println(miCadenitaQueherecibio);
-           
-           socketServicio.close();
-       } catch (IOException ex) {
-            Logger.getLogger(SenioresFarmaceuticos.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
-       }
+            
+            try{
 
+
+                System.out.println("Bienvenido cliente");
+                socketServicio = new Socket(host,port);
+
+                os = new ObjectOutputStream(socketServicio.getOutputStream()); // Abro el flujo de datos (Cliente -> Servidor)
+                os.writeObject(id);  // Le mando al servidor mi identificación
+
+                rellenarAlmacen("resources/DICCIONARIO_DCPF.xml");
+
+                r = (int) Math.random()*(almacenDisponible.size()) + 0;
+
+                System.out.println(" RANDOM 2" + r);
+                System.out.println("Medicamento " + almacenDisponible.get(r).getNombre());
+
+
+                Pedido p = new Pedido(almacenDisponible.get(r),(int)Math.random()*20 + 1);
+
+                os.writeObject(p); // Le envio el pedido
+                //os.writeObject(new Medicamento(1,"Androcurs"));// Le mando el pedido
+
+                is = new ObjectInputStream(socketServicio.getInputStream()); // Abro el flujo de datos (Servidor -> Cliente)
+
+
+                recibeMedicamentos(is, almacenDisponible, p);
+
+
+                socketServicio.close();
+                contador++;
+
+            } catch (IOException ex) {
+                 Logger.getLogger(SenioresFarmaceuticos.class.getName()).log(Level.SEVERE, null, ex);
+                 ex.printStackTrace();
+            }
+        }while (contador <= 10);
        
        
        
